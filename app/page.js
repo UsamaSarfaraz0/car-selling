@@ -14,6 +14,7 @@ import {
   IconButton,
 } from "@mui/material";
 import { PhotoCamera, Close } from "@mui/icons-material";
+import axiosInstance from "../axiosinstance";
 
 const Home = () => {
   const [carModel, setCarModel] = useState("");
@@ -24,8 +25,15 @@ const Home = () => {
   const [pictures, setPictures] = useState([]);
   const [error, setError] = useState("");
 
-  // Cities array
   const cities = ["New York", "Los Angeles", "Chicago", "Houston", "Miami"];
+
+  const resetState = () => {
+    setCarModel("");
+    setPrice("");
+    setPhoneNumber("");
+    setMaxPictures(1);
+    setPictures([]);
+  };
 
   const handleImageSelection = (e) => {
     const files = Array.from(e.target.files);
@@ -42,23 +50,45 @@ const Home = () => {
     setPictures((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (pictures.length > maxPictures) {
       setError(`You cannot upload more than ${maxPictures} pictures.`);
       return;
     }
 
-    const carDetails = {
-      carModel,
-      price,
-      phoneNumber,
-      city,
-      pictures,
-    };
+    const userID = localStorage.getItem("userId");
 
-    console.log("Car details submitted: ", carDetails);
-    alert("Car details submitted!");
+    const formData = new FormData();
+    formData.append("carModel", carModel);
+    formData.append("price", price);
+    formData.append("phoneNumber", phoneNumber);
+    formData.append("city", city);
+    formData.append("createdByUser", userID);
+
+    pictures.forEach((picture, index) => {
+      formData.append(`picture`, picture);
+    });
+
+    try {
+      const response = await axiosInstance.post(
+        "/api/car/sellingpost",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      resetState();
+
+      alert("Car details submitted!");
+      console.log("response", response);
+    } catch (err) {
+      console.log("Error:", err.message);
+      setError(err.message);
+    }
   };
 
   return (

@@ -3,10 +3,8 @@ import { parseCookies } from "nookies";
 
 export function middleware(req) {
   const token = req.cookies.get("token")?.value;
-  console.log("token", token);
-  const { pathname } = req.nextUrl;
 
-  console.log("pathname", pathname);
+  const { pathname } = req.nextUrl;
 
   if (!token && pathname == "/") {
     const url = req.nextUrl.clone();
@@ -14,10 +12,9 @@ export function middleware(req) {
     return NextResponse.redirect(url);
   }
 
-  // If the user is authenticated and trying to access the login page, redirect to home
   if (token && pathname.startsWith("/auth")) {
     const url = req.nextUrl.clone();
-    url.pathname = "/"; // Redirect to the home page
+    url.pathname = "/";
     return NextResponse.redirect(url);
   }
 

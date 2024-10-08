@@ -2,7 +2,7 @@ import axios from "axios";
 import { parseCookies } from "nookies";
 
 const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL, // Replace with your API base URL
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -10,7 +10,7 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = parseCookies()?.token; // Retrieve the token from localStorage
+    const token = parseCookies()?.token;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

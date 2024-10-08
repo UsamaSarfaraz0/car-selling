@@ -33,7 +33,7 @@ const Login = () => {
     if (validateForm()) {
       setLoading(true);
       try {
-        const response = await axiosInstance.post("/api/login", {
+        const response = await axiosInstance.post("/api/auth/login", {
           email,
           password,
         });
@@ -49,6 +49,7 @@ const Login = () => {
             secure: process.env.NODE_ENV === "production",
             httpOnly: false,
           });
+          localStorage.setItem("userId", user._id);
           router.push("/");
         } else {
           setError(data.message || "Invalid email or password.");
