@@ -24,6 +24,7 @@ const Home = () => {
   const [maxPictures, setMaxPictures] = useState(1);
   const [pictures, setPictures] = useState([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const cities = ["New York", "Los Angeles", "Chicago", "Houston", "Miami"];
 
@@ -57,6 +58,11 @@ const Home = () => {
       return;
     }
 
+    if (pictures.length === 0) {
+      setError("At Least one picture is requires");
+      return;
+    }
+
     const userID = localStorage.getItem("userId");
 
     const formData = new FormData();
@@ -71,6 +77,7 @@ const Home = () => {
     });
 
     try {
+      setLoading(true);
       const response = await axiosInstance.post(
         "/api/car/sellingpost",
         formData,
@@ -88,6 +95,8 @@ const Home = () => {
     } catch (err) {
       console.log("Error:", err.message);
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -225,6 +234,7 @@ const Home = () => {
             variant="contained"
             color="primary"
             fullWidth
+            disabled={loading}
             sx={{ mt: 4 }}
           >
             Submit Post
