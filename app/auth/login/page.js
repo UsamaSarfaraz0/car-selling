@@ -3,6 +3,8 @@
 import { Box, Button, Container, TextField, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import axiosInstance from "../../../axiosinstance";
+import { setCookie } from "nookies";
 
 const Login = () => {
   const router = useRouter();
@@ -31,22 +33,23 @@ const Login = () => {
     if (validateForm()) {
       setLoading(true);
       try {
-        const response = await fetch("/api/auth/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: email,
-            password: password,
-          }),
+        const response = await axiosInstance.post("/api/login", {
+          email,
+          password,
         });
 
-        const data = await response.json();
-        setLoading(false);
+        const { token, user } = response.data;
+        console.log("response", response);
 
-        if (response.ok) {
-          router.push("/dashboard");
+        if (token) {
+          setLoading(false);
+          setCookie(null, "token", token, {
+            maxAge: 30 * 24 * 60 * 60,
+            path: "/",
+            secure: process.env.NODE_ENV === "production",
+            httpOnly: false,
+          });
+          router.push("/");
         } else {
           setError(data.message || "Invalid email or password.");
         }
@@ -77,12 +80,6 @@ const Login = () => {
             Sign In
           </Typography>
 
-          {error && (
-            <Typography color="error" className="mb-4">
-              {error}
-            </Typography>
-          )}
-
           <form noValidate onSubmit={handleSignIn}>
             <TextField
               variant="outlined"
@@ -112,6 +109,11 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+            {error && (
+              <Typography color="error" className="my-4">
+                {error}
+              </Typography>
+            )}
             <Button
               type="submit"
               fullWidth
