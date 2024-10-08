@@ -53,13 +53,23 @@ const Home = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (carModel.length < 3) {
+      setError("Car model must be at least 3 letters.");
+      return;
+    }
+
+    if (phoneNumber.length !== 11) {
+      setError("Phone number must be exactly 11 digits.");
+      return;
+    }
+
     if (pictures.length > maxPictures) {
       setError(`You cannot upload more than ${maxPictures} pictures.`);
       return;
     }
 
     if (pictures.length === 0) {
-      setError("At Least one picture is requires");
+      setError("At least one picture is required.");
       return;
     }
 
@@ -129,6 +139,12 @@ const Home = () => {
             required
             value={carModel}
             onChange={(e) => setCarModel(e.target.value)}
+            error={carModel.length > 0 && carModel.length < 3}
+            helperText={
+              carModel.length > 0 && carModel.length < 3
+                ? "Car model must be at least 3 letters."
+                : ""
+            }
           />
 
           <TextField
@@ -151,6 +167,12 @@ const Home = () => {
             type="tel"
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
+            error={phoneNumber.length > 0 && phoneNumber.length !== 11}
+            helperText={
+              phoneNumber.length > 0 && phoneNumber.length !== 11
+                ? "Phone number must be exactly 11 digits."
+                : ""
+            }
           />
 
           <FormControl fullWidth margin="normal">
@@ -177,7 +199,7 @@ const Home = () => {
               required
               label="Maximum Number of Pictures"
             >
-              {[1, 2, 3, 4, 5].map((num) => (
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
                 <MenuItem key={num} value={num}>
                   {num}
                 </MenuItem>
